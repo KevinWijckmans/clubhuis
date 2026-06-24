@@ -19,15 +19,35 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState(auth.currentUser);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+    let active = true;
+
+    const finish = (firebaseUser: typeof auth.currentUser) => {
+      if (!active) return;
       setUser(firebaseUser);
-      if (firebaseUser) {
-        await createUserIfNotExists(firebaseUser);
-      }
       setLoading(false);
+    };
+
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (!active) return;
+      if (firebaseUser) {
+        try {
+          await createUserIfNotExists(firebaseUser);
+        } catch (error) {
+          console.error("Failed to sync user profile", error);
+        }
+      }
+      finish(firebaseUser);
     });
 
-    return () => unsubscribe();
+    const timeout = window.setTimeout(() => {
+      finish(auth.currentUser);
+    }, 1500);
+
+    return () => {
+      active = false;
+      window.clearTimeout(timeout);
+      unsubscribe();
+    };
   }, []);
 
   if (loading) {

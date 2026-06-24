@@ -12,6 +12,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "types": ["node"],
+    "ignoreDeprecations": "5.0",
     "jsx": "preserve",
     "incremental": true,
     "plugins": [{ "name": "next" }],
