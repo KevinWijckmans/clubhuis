@@ -1,7 +1,24 @@
 import { auth, provider } from "./firebase";
-import { signInWithPopup } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  type User,
+} from "firebase/auth";
 
 export const signInWithGoogle = async () => {
   const result = await signInWithPopup(auth, provider);
   return result.user;
 };
+
+export const signInWithEmail = async (email: string, password: string) => {
+  const result = await signInWithEmailAndPassword(auth, email, password);
+  return result.user;
+};
+
+export const signUpWithEmail = async (email: string, password: string) => {
+  const result = await createUserWithEmailAndPassword(auth, email, password);
+  return result.user;
+};
+
+export const getCurrentUser = (): User | null => auth.currentUser;
